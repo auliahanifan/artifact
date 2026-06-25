@@ -2,6 +2,12 @@
 
 Host HTML pages at `/{uniquecode}` with a simple public API. Deployed on Vercel, backed by Supabase Postgres.
 
+## API docs
+
+Interactive Swagger UI: [`/docs`](http://localhost:3000/docs)
+
+OpenAPI spec (JSON): [`/api/openapi`](http://localhost:3000/api/openapi)
+
 ## Endpoints
 
 | Method | Path | Description |
