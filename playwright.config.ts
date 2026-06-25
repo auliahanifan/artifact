@@ -33,6 +33,9 @@ export default defineConfig({
     env: {
       ...process.env,
       DATABASE_URL: process.env.DATABASE_URL ?? "",
+      AUTH_SECRET: process.env.AUTH_SECRET ?? "e2e-test-secret",
+      INPUT_AUTH_USER: process.env.INPUT_AUTH_USER ?? "aulia",
+      INPUT_AUTH_PASSWORD: process.env.INPUT_AUTH_PASSWORD ?? "gantengpokoknya",
     },
   },
 });

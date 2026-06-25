@@ -8,6 +8,10 @@ Interactive Swagger UI: [`/docs`](http://localhost:3000/docs)
 
 OpenAPI spec (JSON): [`/api/openapi`](http://localhost:3000/api/openapi)
 
+## Web UI
+
+Protected form at [`/input`](http://localhost:3000/input) for creating artifacts via browser. Requires login (default credentials in `.env.example`).
+
 ## Endpoints
 
 | Method | Path | Description |
@@ -58,8 +62,16 @@ curl http://localhost:3000/demo
 
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your Supabase DATABASE_URL
+# Edit .env.local with your Supabase DATABASE_URL and AUTH_SECRET
 ```
+
+Optional env vars for `/input` login:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AUTH_SECRET` | `dev-secret-change-me` | Secret for signing session cookies |
+| `INPUT_AUTH_USER` | `aulia` | Login username |
+| `INPUT_AUTH_PASSWORD` | `gantengpokoknya` | Login password |
 
 ### 3. Push schema
 
@@ -97,11 +109,12 @@ The test runner starts the dev server automatically and ensures the `artifacts` 
 ## Deploy to Vercel
 
 1. Push to GitHub and import in Vercel, or run `vercel`
-2. Add `DATABASE_URL` environment variable (Transaction pooler URI)
+2. Add environment variables: `DATABASE_URL`, `AUTH_SECRET`, and optionally `INPUT_AUTH_USER` / `INPUT_AUTH_PASSWORD`
 3. Deploy
 
 ```bash
 vercel env add DATABASE_URL
+vercel env add AUTH_SECRET
 vercel --prod
 ```
 
