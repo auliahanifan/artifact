@@ -16,6 +16,18 @@ export class ArtifactError extends Error {
   }
 }
 
+export async function parseArtifactFormData(formData: FormData) {
+  const uniquecodeRaw = String(formData.get("uniquecode") ?? "").trim();
+  const uniquecode = uniquecodeRaw || undefined;
+
+  const htmlFile = formData.get("html_file");
+  if (htmlFile instanceof File && htmlFile.size > 0) {
+    return { uniquecode, html: await htmlFile.text() };
+  }
+
+  return { uniquecode, html: String(formData.get("html") ?? "") };
+}
+
 export function validateUniquecode(code: string) {
   if (!UNIQUECODE_PATTERN.test(code)) {
     throw new ArtifactError(

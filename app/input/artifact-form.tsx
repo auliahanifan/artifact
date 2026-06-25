@@ -73,9 +73,27 @@ export function ArtifactForm() {
             className={styles.textarea}
             id="html"
             name="html"
-            required
             defaultValue={sampleHtml}
           />
+          <p className={styles.hint}>
+            Paste HTML here, or upload a file below.
+          </p>
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="html_file">
+            HTML file
+          </label>
+          <input
+            className={styles.input}
+            id="html_file"
+            name="html_file"
+            type="file"
+            accept=".html,.htm,text/html"
+          />
+          <p className={styles.hint}>
+            Optional. If provided, the file overrides the textarea.
+          </p>
         </div>
 
         <div className={styles.actions}>

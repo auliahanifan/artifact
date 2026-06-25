@@ -3,7 +3,11 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { ArtifactError, createArtifact } from "@/lib/artifacts";
+import {
+  ArtifactError,
+  createArtifact,
+  parseArtifactFormData,
+} from "@/lib/artifacts";
 import {
   clearAuthCookie,
   isAuthenticated,
@@ -44,12 +48,11 @@ export async function createArtifactAction(formData: FormData) {
     return { error: "Unauthorized" };
   }
 
-  const uniquecodeRaw = String(formData.get("uniquecode") ?? "").trim();
-  const html = String(formData.get("html") ?? "");
+  const { uniquecode, html } = await parseArtifactFormData(formData);
 
   try {
     const result = await createArtifact({
-      uniquecode: uniquecodeRaw || undefined,
+      uniquecode,
       html,
     });
 

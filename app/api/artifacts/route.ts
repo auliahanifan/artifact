@@ -1,16 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { ArtifactError, createArtifact } from "@/lib/artifacts";
+import {
+  ArtifactError,
+  createArtifact,
+  parseArtifactFormData,
+} from "@/lib/artifacts";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { uniquecode, html } = body as {
-      uniquecode?: string;
-      html?: string;
-    };
+    const contentType = request.headers.get("content-type") ?? "";
+    if (!contentType.includes("multipart/form-data")) {
+      return NextResponse.json(
+        { error: "Content-Type must be multipart/form-data" },
+        { status: 415 },
+      );
+    }
 
-    const result = await createArtifact({ uniquecode, html: html ?? "" });
+    const formData = await request.formData();
+    const { uniquecode, html } = await parseArtifactFormData(formData);
+
+    const result = await createArtifact({ uniquecode, html });
 
     const origin =
       request.headers.get("x-forwarded-host") ??

@@ -15,18 +15,27 @@ Protected form at [`/input`](http://localhost:3000/input) for creating artifacts
 
 ### Create artifact
 
+Send `multipart/form-data` with an `html` text field and optional `uniquecode`. You can also upload an `html_file` instead of pasting HTML.
+
 ```bash
 curl -X POST http://localhost:3000/api/artifacts \
-  -H "Content-Type: application/json" \
-  -d '{"html":"<html><body><h1>Hello</h1></body></html>"}'
+  -F 'html=<html><body><h1>Hello</h1></body></html>'
 ```
 
 With a custom code:
 
 ```bash
 curl -X POST http://localhost:3000/api/artifacts \
-  -H "Content-Type: application/json" \
-  -d '{"uniquecode":"demo","html":"<html><body>Demo</body></html>"}'
+  -F 'uniquecode=demo' \
+  -F 'html=<html><body>Demo</body></html>'
+```
+
+From an HTML file:
+
+```bash
+curl -X POST http://localhost:3000/api/artifacts \
+  -F 'uniquecode=demo' \
+  -F 'html_file=@page.html'
 ```
 
 Response (`201`):

@@ -37,10 +37,11 @@ test.describe("/input page", () => {
 
     await expect(page.getByRole("heading", { name: "Create artifact" })).toBeVisible();
     await expect(page.getByLabel("Unique code")).toBeVisible();
-    await expect(page.getByLabel("HTML")).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "HTML", exact: true })).toBeVisible();
+    await expect(page.getByLabel("HTML file")).toBeVisible();
 
     await page.getByLabel("Unique code").fill(uniquecode);
-    await page.getByLabel("HTML").fill(sampleHtml);
+    await page.getByRole("textbox", { name: "HTML", exact: true }).fill(sampleHtml);
     await page.getByRole("button", { name: "Create artifact" }).click();
 
     await expect(page.getByText(`/${uniquecode}`)).toBeVisible();
@@ -48,6 +49,29 @@ test.describe("/input page", () => {
     await page.goto(`/${uniquecode}`);
     await expect(page.getByRole("heading", { name: "Input E2E" })).toBeVisible();
     await expect(page.getByText("from /input")).toBeVisible();
+  });
+
+  test("creates artifact from uploaded HTML file", async ({ page }) => {
+    const uniquecode = testCode("input-file");
+
+    await page.goto("/input");
+
+    await page.getByLabel("Username").fill("aulia");
+    await page.getByLabel("Password").fill("gantengpokoknya");
+    await page.getByRole("button", { name: "Sign in" }).click();
+
+    await page.getByLabel("Unique code").fill(uniquecode);
+    await page.getByLabel("HTML file").setInputFiles({
+      name: "page.html",
+      mimeType: "text/html",
+      buffer: Buffer.from(sampleHtml),
+    });
+    await page.getByRole("button", { name: "Create artifact" }).click();
+
+    await expect(page.getByText(`/${uniquecode}`)).toBeVisible();
+
+    await page.goto(`/${uniquecode}`);
+    await expect(page.getByRole("heading", { name: "Input E2E" })).toBeVisible();
   });
 
   test("logs out and returns to login form", async ({ page }) => {

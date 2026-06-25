@@ -11,7 +11,7 @@ test.describe("artifacts API and pages", () => {
     page,
   }) => {
     const response = await request.post("/api/artifacts", {
-      data: { html: sampleHtml },
+      multipart: { html: sampleHtml },
     });
 
     expect(response.status()).toBe(201);
@@ -33,7 +33,7 @@ test.describe("artifacts API and pages", () => {
     const uniquecode = testCode("custom");
 
     const response = await request.post("/api/artifacts", {
-      data: { uniquecode, html: sampleHtml },
+      multipart: { uniquecode, html: sampleHtml },
     });
 
     expect(response.status()).toBe(201);
@@ -45,6 +45,41 @@ test.describe("artifacts API and pages", () => {
     await expect(page.getByRole("heading", { name: "E2E Hello" })).toBeVisible();
   });
 
+  test("creates artifact from uploaded HTML file", async ({ request, page }) => {
+    const uniquecode = testCode("file");
+
+    const response = await request.post("/api/artifacts", {
+      multipart: {
+        uniquecode,
+        html_file: {
+          name: "page.html",
+          mimeType: "text/html",
+          buffer: Buffer.from(sampleHtml),
+        },
+      },
+    });
+
+    expect(response.status()).toBe(201);
+
+    const body = (await response.json()) as { uniquecode: string };
+    expect(body.uniquecode).toBe(uniquecode);
+
+    await page.goto(`/${uniquecode}`);
+    await expect(page.getByRole("heading", { name: "E2E Hello" })).toBeVisible();
+  });
+
+  test("rejects JSON content type", async ({ request }) => {
+    const response = await request.post("/api/artifacts", {
+      headers: { "Content-Type": "application/json" },
+      data: { html: sampleHtml },
+    });
+
+    expect(response.status()).toBe(415);
+
+    const body = (await response.json()) as { error: string };
+    expect(body.error).toBe("Content-Type must be multipart/form-data");
+  });
+
   test("returns 404 for unknown uniquecode", async ({ request }) => {
     const response = await request.get(`/${testCode("missing")}`);
     expect(response.status()).toBe(404);
@@ -52,7 +87,7 @@ test.describe("artifacts API and pages", () => {
 
   test("rejects empty html", async ({ request }) => {
     const response = await request.post("/api/artifacts", {
-      data: { html: "   " },
+      multipart: { html: "   " },
     });
 
     expect(response.status()).toBe(400);
@@ -63,7 +98,7 @@ test.describe("artifacts API and pages", () => {
 
   test("rejects invalid uniquecode", async ({ request }) => {
     const response = await request.post("/api/artifacts", {
-      data: { uniquecode: "ab", html: sampleHtml },
+      multipart: { uniquecode: "ab", html: sampleHtml },
     });
 
     expect(response.status()).toBe(400);
@@ -76,12 +111,15 @@ test.describe("artifacts API and pages", () => {
     const uniquecode = testCode("dup");
 
     const first = await request.post("/api/artifacts", {
-      data: { uniquecode, html: sampleHtml },
+      multipart: { uniquecode, html: sampleHtml },
     });
     expect(first.status()).toBe(201);
 
     const second = await request.post("/api/artifacts", {
-      data: { uniquecode, html: "<html><body>other</body></html>" },
+      multipart: {
+        uniquecode,
+        html: "<html><body>other</body></html>",
+      },
     });
     expect(second.status()).toBe(409);
 
