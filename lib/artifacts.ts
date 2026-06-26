@@ -1,6 +1,10 @@
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
+import {
+  getCachedArtifact,
+  setCachedArtifact,
+} from "./artifact-cache";
 import { getDb } from "./db";
 import { artifacts } from "./db/schema";
 
@@ -68,10 +72,17 @@ export async function createArtifact(input: {
     html: input.html,
   });
 
+  setCachedArtifact(uniquecode, input.html);
+
   return { uniquecode };
 }
 
 export async function getArtifactByCode(uniquecode: string) {
+  const cached = getCachedArtifact(uniquecode);
+  if (cached) {
+    return cached;
+  }
+
   const db = getDb();
 
   const rows = await db
@@ -80,5 +91,10 @@ export async function getArtifactByCode(uniquecode: string) {
     .where(eq(artifacts.uniquecode, uniquecode))
     .limit(1);
 
-  return rows[0] ?? null;
+  const artifact = rows[0] ?? null;
+  if (artifact) {
+    setCachedArtifact(uniquecode, artifact.html);
+  }
+
+  return artifact;
 }

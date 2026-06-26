@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
+    "lru-cache": "^11.5.1",
     "nanoid": "^5.1.16",
     "next": "16.2.9",
     "postgres": "^3.4.9",
